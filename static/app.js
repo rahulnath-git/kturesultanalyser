@@ -454,8 +454,6 @@ function renderBatchMeta() {
   elements.activeBatchMeta.innerHTML = `
         <p class="eyebrow">Active Batch</p>
         <h2>${escapeHtml(batch.name)}</h2>
-        <p>${escapeHtml(batch.exam_name)}</p>
-        <p>${escapeHtml(batch.institution || "Institution not detected")}</p>
         <p>${filterText}. ${visibleStudents.length} students and ${visibleSubjects.length} subject rows in the current view.</p>
         <p>Uploaded on ${formatDate(batch.uploaded_at)} from ${escapeHtml(batch.source_filename)}</p>
     `;
