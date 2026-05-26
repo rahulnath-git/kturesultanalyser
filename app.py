@@ -355,7 +355,7 @@ class ResultAnalyserHandler(BaseHTTPRequestHandler):
 
 def run() -> None:
     initialise_database(DB_PATH)
-    host = os.environ.get("HOST", "127.0.0.1")
+    host = os.environ.get("HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", "8000"))
     server = ThreadingHTTPServer((host, port), ResultAnalyserHandler)
     print(f"KTU Result Analyser is running on http://{host}:{port}")
