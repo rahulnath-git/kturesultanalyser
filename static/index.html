@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KTU Result Analyser</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-background" aria-hidden="true">
+      <div class="hero-photo-overlay"></div>
+      <img src="/static/assets/cover.jpg" alt="ASET campus cover image" />
+    </div>
+
+    <header class="site-header">
+      <div class="header-banner-shell">
+        <img
+          class="header-banner"
+          src="/static/assets/aset-header.png"
+          alt="Ahalia School of Engineering and Technology"
+        />
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <nav class="tab-bar" aria-label="Dashboard sections">
+        <button
+          id="navToggleButton"
+          class="nav-toggle"
+          type="button"
+          aria-label="Collapse navigation"
+          aria-expanded="true"
+        >
+          <span class="nav-toggle-icon" aria-hidden="true"></span>
+        </button>
+        <div class="tab-list">
+          <button
+            class="tab-button is-active"
+            type="button"
+            data-tab-target="home"
+          >
+            <span class="tab-icon">H</span><span class="tab-label">Home</span>
+          </button>
+          <button class="tab-button" type="button" data-tab-target="upload">
+            <span class="tab-icon">U</span><span class="tab-label">Upload</span>
+          </button>
+          <button class="tab-button" type="button" data-tab-target="batches">
+            <span class="tab-icon">B</span
+            ><span class="tab-label">Saved Batches</span>
+          </button>
+          <button
+            class="tab-button"
+            type="button"
+            data-tab-target="configuration"
+          >
+            <span class="tab-icon">C</span
+            ><span class="tab-label">Configuration</span>
+          </button>
+          <button class="tab-button" type="button" data-tab-target="results">
+            <span class="tab-icon">R</span
+            ><span class="tab-label">Active Batch Results</span>
+          </button>
+        </div>
+      </nav>
+
+      <section class="tab-panels">
+        <section class="home-panel tab-panel is-active" data-tab-panel="home">
+          <div class="hero-photo-title">ASET - KTU Result Analyser</div>
+        </section>
+
+        <article class="panel upload-panel tab-panel" data-tab-panel="upload">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Upload</p>
+              <h3>New Result Batch</h3>
+            </div>
+          </div>
+          <div id="dropZone" class="drop-zone" tabindex="0">
+            <input
+              id="pdfFileInput"
+              type="file"
+              accept=".pdf,application/pdf"
+              hidden
+            />
+            <p class="drop-zone-title">Drop a KTU result PDF here</p>
+            <p class="drop-zone-copy">or browse from your system</p>
+            <button id="browseButton" class="secondary-button" type="button">
+              Choose PDF
+            </button>
+            <p id="selectedFileLabel" class="selected-file">No file selected</p>
+          </div>
+          <label class="field-label" for="batchNameInput">Batch name</label>
+          <input
+            id="batchNameInput"
+            class="text-input"
+            type="text"
+            placeholder="Example: S5 Nov 2025 College Result"
+          />
+          <button id="uploadButton" class="primary-button" type="button">
+            Upload and Analyse
+          </button>
+        </article>
+
+        <aside class="panel batches-panel tab-panel" data-tab-panel="batches">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Saved Batches</p>
+              <h3>Stored Result Sets</h3>
+            </div>
+          </div>
+          <div id="batchList" class="batch-list"></div>
+        </aside>
+
+        <article
+          class="panel config-panel tab-panel"
+          data-tab-panel="configuration"
+        >
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Configuration</p>
+              <h3>Grade to Point Mapping</h3>
+            </div>
+            <div class="inline-actions">
+              <button
+                id="addGradeButton"
+                class="secondary-button"
+                type="button"
+              >
+                Add Grade
+              </button>
+              <button
+                id="saveConfigButton"
+                class="primary-button"
+                type="button"
+              >
+                Save Scale
+              </button>
+            </div>
+          </div>
+          <div class="table-wrap compact-table">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Grade</th>
+                  <th>Points</th>
+                  <th>Pass</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="gradeConfigBody"></tbody>
+            </table>
+          </div>
+          <p class="panel-note">
+            Subject credits can be edited later inside each uploaded batch if
+            you want a weighted GPA.
+          </p>
+        </article>
+
+        <section
+          class="panel dashboard-panel tab-panel"
+          data-tab-panel="results"
+        >
+          <div class="dashboard-header">
+            <div id="activeBatchMeta" class="active-batch-meta">
+              <p class="empty-copy">
+                Upload a result PDF to populate the analytics dashboard.
+              </p>
+            </div>
+            <div class="dashboard-tools">
+              <label class="select-label" for="departmentFilter"
+                >Department view</label
+              >
+              <select id="departmentFilter" class="select-input">
+                <option value="All Departments">All Departments</option>
+              </select>
+              <button
+                id="refreshBatchButton"
+                class="secondary-button"
+                type="button"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="results-subtabs"
+            aria-label="Active batch result sections"
+          >
+            <button
+              class="result-tab-button is-active"
+              type="button"
+              data-result-tab-target="overview"
+            >
+              Overview
+            </button>
+            <button
+              class="result-tab-button"
+              type="button"
+              data-result-tab-target="toppers"
+            >
+              Top 10 Students
+            </button>
+            <button
+              class="result-tab-button"
+              type="button"
+              data-result-tab-target="credits"
+            >
+              Subject Credits
+            </button>
+            <button
+              class="result-tab-button"
+              type="button"
+              data-result-tab-target="register"
+            >
+              GPA Register
+            </button>
+          </div>
+
+          <div class="result-panel-shell">
+            <section
+              class="result-subpanel is-active"
+              data-result-panel="overview"
+            >
+              <div id="unknownGradeNotice" class="notice hidden"></div>
+              <div id="summaryCards" class="summary-cards"></div>
+
+              <article class="subpanel export-panel">
+                <div class="subpanel-heading">
+                  <div>
+                    <p class="eyebrow">Exports</p>
+                    <h3>Analysis Download</h3>
+                  </div>
+                  <div class="export-actions">
+                    <button
+                      id="downloadWordButton"
+                      class="primary-button"
+                      type="button"
+                    >
+                      Download Word
+                    </button>
+                  </div>
+                </div>
+                <div class="export-controls">
+                  <div class="threshold-field">
+                    <label class="field-label" for="gpaThresholdInput"
+                      >GPA threshold</label
+                    >
+                    <input
+                      id="gpaThresholdInput"
+                      class="text-input threshold-input"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.01"
+                      value="7"
+                    />
+                  </div>
+                  <p class="section-note export-note">
+                    Word includes pass percentage, top 10 rank holders in each
+                    department, failed students with failed subjects, and
+                    students with GPA greater than the threshold.
+                  </p>
+                </div>
+              </article>
+            </section>
+
+            <section class="result-subpanel" data-result-panel="toppers">
+              <article class="subpanel">
+                <div class="subpanel-heading">
+                  <div>
+                    <p class="eyebrow">Ranking</p>
+                    <h3>Top 10 Students</h3>
+                  </div>
+                </div>
+                <div id="topStudentsTable"></div>
+              </article>
+            </section>
+
+            <section class="result-subpanel" data-result-panel="credits">
+              <article class="subpanel">
+                <div class="subpanel-heading">
+                  <div>
+                    <p class="eyebrow">Subjects</p>
+                    <h3>Pass Percentage and Credits</h3>
+                  </div>
+                  <button
+                    id="saveCreditsButton"
+                    class="primary-button"
+                    type="button"
+                  >
+                    Save Credits
+                  </button>
+                </div>
+                <p class="section-note">
+                  Credits default to 1. Update them here if you want GPA to
+                  reflect subject weightage.
+                </p>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Department</th>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Credits</th>
+                        <th>Appeared</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>Absent</th>
+                        <th>Pass %</th>
+                      </tr>
+                    </thead>
+                    <tbody id="subjectsBody"></tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+
+            <section class="result-subpanel" data-result-panel="register">
+              <article class="subpanel">
+                <div class="subpanel-heading">
+                  <div>
+                    <p class="eyebrow">Students</p>
+                    <h3>GPA Register</h3>
+                  </div>
+                  <div class="inline-actions">
+                    <input
+                      id="studentSearchInput"
+                      class="text-input search-input"
+                      type="search"
+                      placeholder="Search by register number"
+                    />
+                    <button
+                      id="downloadRegisterExcelButton"
+                      class="secondary-button"
+                      type="button"
+                    >
+                      Download Excel
+                    </button>
+                  </div>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Register No</th>
+                        <th>Department</th>
+                        <th>GPA</th>
+                        <th>Passed</th>
+                        <th>Failed</th>
+                        <th>Subjects</th>
+                        <th>Grades</th>
+                      </tr>
+                    </thead>
+                    <tbody id="studentsBody"></tbody>
+                  </table>
+                </div>
+              </article>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="statusToast" class="status-toast hidden"></div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
