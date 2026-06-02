@@ -31,6 +31,7 @@ const elements = {
     "#downloadRegisterExcelButton",
   ),
   topStudentsTable: document.querySelector("#topStudentsTable"),
+  subjectPerformanceBody: document.querySelector("#subjectPerformanceBody"),
   subjectsBody: document.querySelector("#subjectsBody"),
   saveCreditsButton: document.querySelector("#saveCreditsButton"),
   studentSearchInput: document.querySelector("#studentSearchInput"),
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function bindEvents() {
-  elements.navToggleButton.addEventListener("click", toggleNavigation);
+  elements.navToggleButton?.addEventListener("click", toggleNavigation);
 
   elements.tabButtons.forEach((button) => {
     button.addEventListener("click", () =>
@@ -426,6 +427,8 @@ function renderActiveBatch() {
       '<div class="empty-state">No ranking data available.</div>';
     elements.subjectsBody.innerHTML =
       '<tr><td colspan="9"><div class="empty-state">No subject data available.</div></td></tr>';
+    elements.subjectPerformanceBody.innerHTML =
+      '<tr><td colspan="7"><div class="empty-state">No subject performance data available.</div></td></tr>';
     elements.studentsBody.innerHTML =
       '<tr><td colspan="7"><div class="empty-state">No student data available.</div></td></tr>';
     elements.unknownGradeNotice.classList.add("hidden");
@@ -437,6 +440,7 @@ function renderActiveBatch() {
   renderUnknownNotice();
   renderSummaryCards();
   renderRankingTables();
+  renderSubjectPerformanceTable();
   renderSubjectsTable();
   renderStudentsTable();
   syncExportButtons();
@@ -572,6 +576,31 @@ function renderSubjectsTable() {
                     <td>${subject.failed_count}</td>
                     <td>${subject.absent_count}</td>
                     <td>${subject.pass_percentage.toFixed(2)}</td>
+                </tr>
+            `,
+    )
+    .join("");
+}
+
+function renderSubjectPerformanceTable() {
+  const subjects = getVisibleSubjects();
+  if (!subjects.length) {
+    elements.subjectPerformanceBody.innerHTML =
+      '<tr><td colspan="7"><div class="empty-state">No subject performance rows available for this filter.</div></td></tr>';
+    return;
+  }
+
+  elements.subjectPerformanceBody.innerHTML = subjects
+    .map(
+      (subject) => `
+                <tr>
+                    <td>${escapeHtml(subject.department_name)}</td>
+                    <td>${escapeHtml(subject.course_code)}</td>
+                    <td>${escapeHtml(subject.course_name)}</td>
+                    <td>${subject.appeared_count}</td>
+                    <td>${subject.passed_count}</td>
+                    <td>${subject.absent_count}</td>
+                    <td>${subject.pass_percentage.toFixed(2)} (${subject.passed_count}:${subject.appeared_count})</td>
                 </tr>
             `,
     )
@@ -929,8 +958,10 @@ function handleCollapseByScroll(scrollTop) {
   if (!header) return;
   if (scrollTop > 50) {
     header.classList.add("is-collapsed");
+    document.body.classList.add("header-collapsed");
   } else {
     header.classList.remove("is-collapsed");
+    document.body.classList.remove("header-collapsed");
   }
 }
 
@@ -946,7 +977,7 @@ window.addEventListener(
 
 // Panels that may scroll independently (e.g. result panel shell)
 const scrollablePanels = Array.from(
-  document.querySelectorAll(".result-panel-shell, .table-wrap, .tab-panels"),
+  document.querySelectorAll(".table-wrap, .tab-panels"),
 );
 scrollablePanels.forEach((el) => {
   el.addEventListener(
